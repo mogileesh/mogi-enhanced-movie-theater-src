@@ -15,9 +15,15 @@ public class ReservationTests {
 	private static final int FIRST_SHOW_OF_THE_DAY = 1;
 	private static final int SECOND_SHOW_OF_THE_DAY = 2;
 	private static final int THIRD_SHOW_OF_THE_DAY = 3;
+	private static final int FORTH_SHOW_OF_THE_DAY = 4;
+	private static final int SEVENTH_DAY = 7;
 	
 	LocalDateTime moringTime = LocalDateTime.of(LocalDateProvider.singleton().currentDate(), LocalTime.of(9, 30));
 	LocalDateTime noonTime = LocalDateTime.of(LocalDateProvider.singleton().currentDate(), LocalTime.of(12, 00));
+	LocalDateTime eveningTime = LocalDateTime.of(LocalDateProvider.singleton().currentDate(), LocalTime.of(18, 00));
+	
+	LocalDateTime seventhDayOfTheMonthDate  = LocalDateTime.of(2022, 11, SEVENTH_DAY, 18, 00);
+	
 	Customer customer = new Customer("John Doe", "unused-id");
 	
 	 private Movie createSpecialMovie1() {
@@ -32,7 +38,9 @@ public class ReservationTests {
 		    return MovieFactory.createMovie("The Batman", Duration.ofMinutes(90), 10, REGULAR);
 		 }
 	
-    @Test
+    // Special movie reservation discount tests followed by Regular movie reservation discount tests
+	 
+	 @Test
     void totalFee_specialMovie_1stShowOfTheDay() {
         var showing = new Showing(
         		createSpecialMovie1(),
@@ -74,6 +82,29 @@ public class ReservationTests {
     }
     
     @Test
+    void totalFee_specialMovie_eveningTimeOfTheDay() {
+        var showing = new Showing(
+        		createSpecialMovie1(),
+        		FORTH_SHOW_OF_THE_DAY,
+        		eveningTime
+        );
+        assertTrue(new Reservation(customer, showing, 4).totalFee() == 32.0);
+    }
+    
+    @Test
+    void totalFee_specialMovie_seventhDayOfTheMonth() {
+        var showing = new Showing(
+        		createSpecialMovie1(),
+        		FORTH_SHOW_OF_THE_DAY,
+        		seventhDayOfTheMonthDate
+        );
+        assertTrue(new Reservation(customer, showing, 4).totalFee() == 32.0);
+    }
+    
+    
+    // Regular movie reservation discount tests
+    
+    @Test
     void totalFee_regularMovie_1stShowOfTheDay() {
         var showing = new Showing(
         		createRegularMovie1(),
@@ -94,7 +125,7 @@ public class ReservationTests {
     }
     
     @Test
-    void totalFee_regularMovie_3rdShowOfTheDay() {
+    void totalFee_regularMovie_3rdShowOfTheDay__noDiscount() {
         var showing = new Showing(
         		createRegularMovie1(),
                 THIRD_SHOW_OF_THE_DAY,
@@ -111,6 +142,26 @@ public class ReservationTests {
                 noonTime
         );
         assertTrue(new Reservation(customer, showing, 4).totalFee() == 30.0);
+    }
+    
+    @Test
+    void totalFee_regularMovie_seventhDayOfTheMonth() {
+        var showing = new Showing(
+        		createRegularMovie1(),
+        		FORTH_SHOW_OF_THE_DAY,
+        		seventhDayOfTheMonthDate
+        );
+        assertTrue(new Reservation(customer, showing, 4).totalFee() == 36.0);
+    }
+    
+    @Test
+    void totalFee_regularMovie_eveningTimeOfTheDay_noDiscount() {
+        var showing = new Showing(
+        		createRegularMovie1(),
+        		FORTH_SHOW_OF_THE_DAY,
+        		eveningTime
+        );
+        assertTrue(new Reservation(customer, showing, 4).totalFee() == 40.0);
     }
     
 }
